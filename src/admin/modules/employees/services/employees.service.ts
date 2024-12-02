@@ -1,4 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class EmployeesService {}
+export class EmployeesService {
+  getEmployees() {
+    return 'Many employees';
+  }
+}

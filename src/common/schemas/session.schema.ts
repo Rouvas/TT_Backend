@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 
-export type ModelDocument = Model & Document;
+export type SessionDocument = Session & Document;
 
 @Schema({
   versionKey: false, // __v field not saving to db
@@ -13,12 +13,15 @@ export type ModelDocument = Model & Document;
     },
   },
 })
-export class Model {
-  @Prop({ type: Types.ObjectId, ref: 'Brand', required: true })
-  brandId: Types.ObjectId;
+export class Session {
+  @Prop({ required: true })
+  user: string;
 
   @Prop({ required: true })
-  name: string;
+  token: string;
+
+  @Prop({ required: true })
+  expiredTime: number;
 }
 
-export const ModelSchema = SchemaFactory.createForClass(Model);
+export const SessionSchema = SchemaFactory.createForClass(Session);
