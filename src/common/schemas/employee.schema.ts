@@ -14,7 +14,7 @@ export type EmployeeDocument = Employee & Document;
   },
 })
 export class Employee {
-  @Prop({ required: true })
+  @Prop()
   password: string;
 
   @Prop({ required: true, unique: true })
