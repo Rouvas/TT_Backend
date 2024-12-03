@@ -75,7 +75,23 @@ export class BrandService {
   }
 
   async getModelsByBrand(id: string, res: Response) {
-    const entities = await this._modelModel.find({ brandId: id });
-    return res.status(HttpStatus.OK).json(entities);
+    try {
+      const entity = await this._brandModel
+        .findById(id)
+        .populate('models')
+        .exec();
+
+      if (entity) {
+        return res.status(HttpStatus.OK).json(entity.toJSON()['models']);
+      } else {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: 'Бренд не найден' });
+      }
+    } catch (e) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ message: 'Бренд не найден' });
+    }
   }
 }

@@ -1,5 +1,28 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, SchemaTypes } from 'mongoose';
+
+@Schema({
+  _id: false,
+  versionKey: false,
+  toJSON: {
+    virtuals: true,
+    transform(doc, ret) {
+      ret.id = ret._id;
+      delete ret._id;
+    },
+  },
+  toObject: { virtuals: true },
+})
+export class EntityParameterValue {
+  @Prop({ required: true })
+  parameterId: string; // Ссылка на id из EntityParameter
+
+  @Prop({ required: true, type: SchemaTypes.Mixed })
+  value: string | number | string[]; // Для select_many может быть массивом id
+}
+
+export const EntityParameterValueSchema =
+  SchemaFactory.createForClass(EntityParameterValue);
 
 export type EntityDocument = Entity & Document;
 
@@ -52,6 +75,9 @@ export class Entity {
 
   @Prop()
   publicationDate: number;
+
+  @Prop({ type: [EntityParameterValueSchema], default: [] })
+  parameters: EntityParameterValue[];
 
   @Prop({
     enum: [

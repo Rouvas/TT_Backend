@@ -4,7 +4,7 @@ import { BrandService } from './services/brand.service';
 import { BrandsService } from './services/brands.service';
 import { BrandDto } from "./dto/brand.dto";
 
-@Controller('admin/brands')
+@Controller('admin/common/entity/brands')
 export class BrandsController {
   constructor(
     private _brand: BrandService,

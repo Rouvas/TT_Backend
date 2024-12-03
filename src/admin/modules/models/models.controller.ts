@@ -4,7 +4,7 @@ import { ModelService } from './services/model.service';
 import { ModelsService } from './services/models.service';
 import { ModelDto } from './dto/model.dto';
 
-@Controller('admin/models')
+@Controller('admin/common/entity/models')
 export class ModelsController {
   constructor(
     private _model: ModelService,
