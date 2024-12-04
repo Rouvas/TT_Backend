@@ -18,6 +18,9 @@ export class Session {
   user: string;
 
   @Prop({ required: true })
+  key: string;
+
+  @Prop({ required: true })
   token: string;
 
   @Prop({ required: true })

@@ -7,6 +7,13 @@ import { ModelsModule } from './modules/models/models.module';
 import { EntityParametersModule } from './modules/entity-parameters/entity-parameters.module';
 
 @Module({
-  imports: [EmployeesModule, AuthorizationModule, EntitiesModule, BrandsModule, ModelsModule, EntityParametersModule],
+  imports: [
+    EmployeesModule,
+    AuthorizationModule,
+    EntitiesModule,
+    BrandsModule,
+    ModelsModule,
+    EntityParametersModule,
+  ],
 })
 export class AdminModule {}
