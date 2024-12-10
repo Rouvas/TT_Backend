@@ -1,5 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, SchemaTypes } from 'mongoose';
+import mongoose, { Document, Model, SchemaTypes, Types } from 'mongoose';
+import slugify from 'slugify';
+import { Brand, BrandSchema } from "./brand.schema";
+import { Model as BrandModel, ModelSchema } from "./model.schema";
 
 @Schema({
   _id: false,
@@ -18,7 +21,7 @@ export class EntityParameterValue {
   parameterId: string; // Ссылка на id из EntityParameter
 
   @Prop({ required: true, type: SchemaTypes.Mixed })
-  value: string | number | string[]; // Для select_many может быть массивом id
+  value: string | number | string[] | number[]; // Для select_many может быть массивом id
 }
 
 export const EntityParameterValueSchema =
@@ -40,11 +43,11 @@ export class Entity {
   @Prop({ required: true, unique: true })
   seoIdentifier: string;
 
-  @Prop({ required: true })
-  brandId: string;
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'Brand', required: true })
+  brandId: Types.ObjectId;
 
-  @Prop({ required: true })
-  modelId: string;
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'Model', required: true })
+  modelId: Types.ObjectId;
 
   @Prop({ required: true })
   name: string;
@@ -65,16 +68,22 @@ export class Entity {
   type: string;
 
   @Prop({ required: true })
-  price: number;
+  sellPrice: number;
+
+  @Prop({ required: true })
+  sellPriceMarket: number;
+
+  @Prop({ required: true })
+  boughtPrice: number;
 
   @Prop()
   images: string[];
 
-  @Prop({ required: true })
-  createDate: number;
+  @Prop({ type: Date, default: null })
+  publicationDate: Date | null;
 
   @Prop()
-  publicationDate: number;
+  market_sku: string;
 
   @Prop({ type: [EntityParameterValueSchema], default: [] })
   parameters: EntityParameterValue[];
@@ -91,11 +100,30 @@ export class Entity {
       'deleted',
     ],
     required: true,
+    default: 'created',
   })
   status: string;
 
   @Prop()
-  viewersCounter: number;
+  viewers: { date: string; key: string }[];
 }
 
 export const EntitySchema = SchemaFactory.createForClass(Entity);
+
+// Виртуальные поля для популяции Brand и Model
+EntitySchema.virtual('brand', {
+  ref: 'Brand',
+  localField: 'brandId',
+  foreignField: '_id',
+  justOne: true,
+});
+
+EntitySchema.virtual('model', {
+  ref: 'Model',
+  localField: 'modelId',
+  foreignField: '_id',
+  justOne: true,
+});
+
+EntitySchema.set('toObject', { virtuals: true });
+EntitySchema.set('toJSON', { virtuals: true });

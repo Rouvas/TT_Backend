@@ -1,22 +1,22 @@
-import { Controller, Get, Param, Req } from "@nestjs/common";
+import { Controller, Get, Param, Req, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { EntityService } from './services/entity.service';
+import { EntitiesService } from './services/entities.service';
 
 @Controller('entities')
 export class EntitiesController {
-
-  // Get entities
+  constructor(
+    private _entity: EntityService,
+    private _entities: EntitiesService,
+  ) {}
 
   @Get()
-  getAllEntities(@Req() request: Request): string {
-    return 'This action returns all cats';
+  getAllEntities(@Res() res: Response) {
+    return this._entities.getEntities(res);
   }
 
   @Get(':id')
-  getEntityById(@Param('id') id: string, @Req() request: Request): string {
-    return `This action returns ${id}`;
-  }
-
-  @Get(':id/MarkAsViewed')
-  markEntityAsViewed(@Param('id') id: string, @Req() request: Request): string {
-    return 'This action returns all cats';
+  getEntityById(@Req() req: Request, @Param('id') id: string, @Res() res: Response) {
+    return this._entity.getEntity(req, id, res);
   }
 }

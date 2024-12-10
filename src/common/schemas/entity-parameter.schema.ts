@@ -58,7 +58,7 @@ export class EntityParameter {
   entityType: string;
 
   @Prop({ type: [ValueVariantSchema], default: null })
-  valuesVariants: ValueVariant[] | null;
+  valuesVariants: ValueVariant[] | ValueVariant | null;
 }
 
 export const EntityParameterSchema = SchemaFactory.createForClass(EntityParameter);
