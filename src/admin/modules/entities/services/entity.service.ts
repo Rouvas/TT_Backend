@@ -13,6 +13,7 @@ import {
   Model as BrandModel,
   ModelDocument,
 } from '../../../../common/schemas/model.schema';
+import { EntityImagePositionDto } from "../dto/entity-image-position.dto";
 
 @Injectable()
 export class EntityService {
@@ -43,6 +44,10 @@ export class EntityService {
   }
 
   patchEntity() {}
+
+  async postEntityImagesPositions(dto: EntityImagePositionDto, id: string, res: Response) {
+
+  }
 
   async postEntity(dto: EntityDto, res: Response) {
     try {

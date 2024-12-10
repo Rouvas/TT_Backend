@@ -6,9 +6,15 @@ import { TgbotService } from './common/services/tgbot.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { UtilitiesController } from './common/controllers/utilities/utilities.controller';
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      serveRoot: '/storage',
+      rootPath: join(__dirname, '..', '..', '..', '/storage'),
+    }),
     MongooseModule.forRoot('mongodb://localhost/tehnotitan'),
     AdminModule,
     EntitiesModule,

@@ -105,7 +105,7 @@ export class Entity {
   status: string;
 
   @Prop()
-  viewers: { date: string; key: string }[];
+  viewers: { date: string; key: string; ip: string }[];
 }
 
 export const EntitySchema = SchemaFactory.createForClass(Entity);

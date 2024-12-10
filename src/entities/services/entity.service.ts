@@ -17,6 +17,20 @@ export class EntityService {
         .populate('brand')
         .populate('model');
 
+      const key = req.header('user-key');
+      const ip = req.ip;
+
+      if (key) {
+        if (!entity.viewers.find((el) => el.ip === ip || el.key === key)) {
+          entity.viewers.push({
+            key: key.toString(),
+            date: new Date().toJSON(),
+            ip: ip,
+          });
+          entity.save();
+        }
+      }
+
       const jsonEntity = entity.toJSON();
       const transformedEntity = {
         seoIdentifier: jsonEntity.seoIdentifier,
