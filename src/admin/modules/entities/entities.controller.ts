@@ -19,7 +19,6 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import { EntityImagePositionDto } from './dto/entity-image-position.dto';
 import { AuthGuard } from '../../guards/auth.guard';
 
 @Controller('admin/entities')

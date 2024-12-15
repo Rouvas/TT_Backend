@@ -20,7 +20,12 @@ export class EmployeeService {
       const employee = await this._employeeModel.findById(id);
 
       if (employee) {
-        return res.status(HttpStatus.OK).json(employee);
+        return res.status(HttpStatus.OK).json({
+          fullName: employee.fullName,
+          email: employee.email,
+          phone: employee.phone,
+          id: employee._id,
+        });
       } else {
         return res
           .status(HttpStatus.NOT_FOUND)
@@ -80,6 +85,7 @@ export class EmployeeService {
           email: employee.email,
           phone: employee.phone,
           fullName: employee.fullName,
+          id: employee._id,
         });
       } else {
         return res
