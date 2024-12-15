@@ -8,6 +8,7 @@ import {
   Post,
   Res,
   UploadedFiles,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { EntityService } from './services/entity.service';
@@ -19,6 +20,7 @@ import { diskStorage } from 'multer';
 import { extname } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { EntityImagePositionDto } from './dto/entity-image-position.dto';
+import { AuthGuard } from '../../guards/auth.guard';
 
 @Controller('admin/entities')
 export class EntitiesController {
@@ -28,21 +30,25 @@ export class EntitiesController {
   ) {}
 
   @Get()
+  @UseGuards(AuthGuard)
   getEntities(@Res() res: Response) {
     return this._entities.getEntities(res);
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard)
   getEntity(@Param('id') id: string, @Res() res: Response) {
     return this._entity.getEntity(id, res);
   }
 
   @Post()
+  @UseGuards(AuthGuard)
   postEntity(@Body() newEntity: EntityDto, @Res() res: Response) {
     return this._entity.postEntity(newEntity, res);
   }
 
   @Post(':id')
+  @UseGuards(AuthGuard)
   @UseInterceptors(
     FilesInterceptor('image', 10, {
       // 'files' - имя поля формы, максимум 10 файлов
@@ -79,15 +85,16 @@ export class EntitiesController {
     return res.status(200).json({ newImages: files.map((el) => el.filename) });
   }
 
-  postChangeImagesPosition(
-    @Param('id') id: string,
-    @Body() dto: EntityImagePositionDto,
-    @Res() res: Response,
-  ) {
-    return this._entity.postEntityImagesPositions(dto, id, res);
-  }
+  // postChangeImagesPosition(
+  //   @Param('id') id: string,
+  //   @Body() dto: EntityImagePositionDto,
+  //   @Res() res: Response,
+  // ) {
+  //   return this._entity.postEntityImagesPositions(dto, id, res);
+  // }
 
   @Patch(':id')
+  @UseGuards(AuthGuard)
   patchEntity(
     @Param('id') id: string,
     @Body() newEntity: EntityDto,

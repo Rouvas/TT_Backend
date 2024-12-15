@@ -9,15 +9,23 @@ import {
   ValueVariant,
   ValueVariantSchema,
 } from '../../../common/schemas/entity-parameter.schema';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthGuard } from '../../guards/auth.guard';
 
 @Module({
   imports: [
+    JwtModule.register({
+      secret: process.env.PRIVATE_KEY || 'DEV',
+      signOptions: {
+        expiresIn: '24h',
+      },
+    }),
     MongooseModule.forFeature([
       { name: EntityParameter.name, schema: EntityParameterSchema },
       { name: ValueVariant.name, schema: ValueVariantSchema },
     ]),
   ],
   controllers: [EntityParametersController],
-  providers: [EntityParametersService, EntityParameterService],
+  providers: [EntityParametersService, EntityParameterService, AuthGuard],
 })
 export class EntityParametersModule {}

@@ -24,6 +24,9 @@ export class Session {
   token: string;
 
   @Prop({ required: true })
+  refreshToken: string;
+
+  @Prop({ required: true })
   expiredTime: number;
 }
 

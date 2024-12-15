@@ -1,17 +1,26 @@
-import { Body, HttpStatus, Injectable, Req, Res } from "@nestjs/common";
-import { ResetDto } from "../dto/reset.dto";
-import { Request, Response } from "express";
-import { LoginDto } from "../dto/login.dto";
-import { InjectModel } from "@nestjs/mongoose";
-import * as bcrypt from "bcryptjs";
-import { Employee, EmployeeDocument } from "../../../../common/schemas/employee.schema";
-import { Model } from "mongoose";
-import { Session, SessionDocument } from "../../../../common/schemas/session.schema";
-import { JwtService } from "@nestjs/jwt";
-import { EmployeeDto } from "../../employees/dto/employee.dto";
-import { CompleteResetDto } from "../dto/complete-reset.dto";
-import { ResetPassword, ResetPasswordDocument } from "../../../../common/schemas/reset-password.schema";
-import { generateSecureRandomInteger } from "../../../../common/functions/generate-secure-random-integer";
+import { Body, HttpStatus, Injectable, Req, Res } from '@nestjs/common';
+import { ResetDto } from '../dto/reset.dto';
+import { Request, Response } from 'express';
+import { LoginDto } from '../dto/login.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import * as bcrypt from 'bcryptjs';
+import {
+  Employee,
+  EmployeeDocument,
+} from '../../../../common/schemas/employee.schema';
+import { Model } from 'mongoose';
+import {
+  Session,
+  SessionDocument,
+} from '../../../../common/schemas/session.schema';
+import { JwtService } from '@nestjs/jwt';
+import { CompleteResetDto } from '../dto/complete-reset.dto';
+import {
+  ResetPassword,
+  ResetPasswordDocument,
+} from '../../../../common/schemas/reset-password.schema';
+import { generateSecureRandomInteger } from '../../../../common/functions/generate-secure-random-integer';
+import { generateSecureRandomHash } from '../../../../common/functions/generate-secure-random-hash';
 
 @Injectable()
 export class AuthorizationService {
@@ -31,14 +40,18 @@ export class AuthorizationService {
     @Res() res: Response,
   ) {
     const key = req.header('user-key');
-    if ((!dto.email && !dto.phone) || !key)
+
+    if (!dto.login || !key)
       return res
         .status(HttpStatus.BAD_REQUEST)
-        .json({ message: 'Ошибка авторизации' });
+        .json({ message: 'Ошибка идентификации' });
 
-    const findBy = dto.email ? { email: dto.email } : { phone: dto.phone };
+    const findBy = dto.login.includes('@')
+      ? { email: dto.login }
+      : { phone: dto.login };
 
     const employee = await this._employeeModel.findOne(findBy);
+
     if (!employee)
       return res
         .status(HttpStatus.NOT_FOUND)
@@ -57,7 +70,8 @@ export class AuthorizationService {
 
     const expiredTime = new Date().getTime() + 604800000;
 
-    const accessToken = this.generateToken(employee);
+    const accessToken = await this.generateToken(employee);
+    const refreshToken = generateSecureRandomHash(30);
 
     try {
       await this._sessionModel.create({
@@ -65,16 +79,18 @@ export class AuthorizationService {
         user: employee._id,
         token: accessToken,
         expiredTime: expiredTime,
+        refreshToken: refreshToken,
       });
       return res.status(HttpStatus.ACCEPTED).json({
         message: 'Успешно авторизован',
         expiredTime: expiredTime,
         accessToken: accessToken,
+        refreshToken: refreshToken,
       });
     } catch (e) {
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: 'Произошла неизвестная ошибка', detailed: e });
+        .json({ message: 'Произошла неизвестная ошибка', details: e });
     }
   }
 
@@ -84,13 +100,16 @@ export class AuthorizationService {
     @Res() res: Response,
   ) {
     const key = req.header('user-key');
-    if (!key) {
+
+    if (!key || !dto.login) {
       return res
         .status(HttpStatus.BAD_REQUEST)
-        .json({ message: 'Ошибка авторизации' });
+        .json({ message: 'Ошибка идентификации', details: null });
     }
 
-    const findBy = dto.email ? { email: dto.email } : { phone: dto.phone };
+    const findBy = dto.login.includes('@')
+      ? { email: dto.login }
+      : { phone: dto.login };
     const employee = await this._employeeModel.findOne(findBy);
     if (!employee) {
       return res
@@ -134,7 +153,7 @@ export class AuthorizationService {
     } catch (e) {
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: 'Произошла неизвестная ошибка', detailed: e });
+        .json({ message: 'Произошла неизвестная ошибка', details: e.message });
     }
   }
 
@@ -147,9 +166,11 @@ export class AuthorizationService {
     if (!key)
       return res
         .status(HttpStatus.BAD_REQUEST)
-        .json({ message: 'Ошибка авторизации' });
+        .json({ message: 'Ошибка идентификации' });
 
-    const findBy = dto.email ? { email: dto.email } : { phone: dto.phone };
+    const findBy = dto.login.includes('@')
+      ? { email: dto.login }
+      : { phone: dto.login };
 
     const employee = await this._employeeModel.findOne(findBy);
     if (!employee) {
@@ -191,16 +212,18 @@ export class AuthorizationService {
     } catch (e) {
       return res
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .json({ message: 'Произошла неизвестная ошибка', detailed: e });
+        .json({ message: 'Произошла неизвестная ошибка', details: e.message });
     }
   }
 
-  async generateToken(employee: EmployeeDto) {
+  async generateToken(employee: any) {
     const payload = {
       email: employee.email,
       phone: employee.phone,
       fullName: employee.fullName,
+      id: employee.id,
     };
+    console.log(payload);
     return this.jwtService.sign(payload);
   }
 }

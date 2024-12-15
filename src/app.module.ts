@@ -5,9 +5,9 @@ import { MailerService } from './common/services/mailer.service';
 import { TgbotService } from './common/services/tgbot.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TelegrafModule } from 'nestjs-telegraf';
-import { UtilitiesController } from './common/controllers/utilities/utilities.controller';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { UtilitiesController } from './common/controllers/utilities.controller';
 
 @Module({
   imports: [

@@ -15,7 +15,8 @@ export class EntitiesService {
   ) {}
 
   async getEntities(res: Response) {
-    const entities = await this._entityModel.find()
+    const entities = await this._entityModel
+      .find()
       .populate('brand')
       .populate('model');
     if (entities) {

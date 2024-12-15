@@ -2,7 +2,7 @@ import { HttpStatus, Injectable } from '@nestjs/common';
 import { EmployeeDto } from '../dto/employee.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import {
   Employee,
   EmployeeDocument,
@@ -17,19 +17,19 @@ export class EmployeeService {
 
   async getEmployee(id: string, res: Response) {
     try {
-      const entity = await this._employeeModel.findById(id);
+      const employee = await this._employeeModel.findById(id);
 
-      if (entity) {
-        return res.status(HttpStatus.OK).json(entity);
+      if (employee) {
+        return res.status(HttpStatus.OK).json(employee);
       } else {
         return res
           .status(HttpStatus.NOT_FOUND)
-          .json({ message: 'Сотрудник не найден' });
+          .json({ message: 'Сотрудник не найден', details: null });
       }
     } catch (e) {
       return res
         .status(HttpStatus.NOT_FOUND)
-        .json({ message: 'Сотрудник не найден' });
+        .json({ message: 'Сотрудник не найден', details: e.message });
     }
   }
 
@@ -39,10 +39,10 @@ export class EmployeeService {
         .status(HttpStatus.BAD_REQUEST)
         .json({ message: 'Незаполнены поля' });
     try {
-      const brand = await this._employeeModel.findByIdAndUpdate(id, dto);
+      const employee = await this._employeeModel.findByIdAndUpdate(id, dto);
       return res
         .status(HttpStatus.OK)
-        .json({ message: 'Успешно изменено', id: brand._id });
+        .json({ message: 'Успешно изменено', id: employee._id });
     } catch (e) {
       return res
         .status(HttpStatus.NOT_FOUND)
@@ -50,12 +50,47 @@ export class EmployeeService {
     }
   }
 
-  patchSelfEmployee(dto: EmployeeDto) {
-    return dto;
+  async patchSelfEmployee(dto: EmployeeDto, req: Request, res: Response) {
+    if (Object.keys(dto).length === 0)
+      return res
+        .status(HttpStatus.BAD_REQUEST)
+        .json({ message: 'Незаполнены поля' });
+    try {
+      const employee = await this._employeeModel.findById(req['user']['id']);
+      const foundEmployee = await this._employeeModel.findByIdAndUpdate(
+        employee,
+        { fullName: dto.fullName, email: dto.email, phone: dto.phone },
+      );
+      return res
+        .status(HttpStatus.OK)
+        .json({ message: 'Успешно изменено', id: foundEmployee._id });
+    } catch (e) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ message: 'Сотрудник не найден', error: e.message });
+    }
   }
 
-  getSelfEmployee() {
-    return 'Some me get';
+  async getSelfEmployee(req: Request, res: Response) {
+    try {
+      const employee = await this._employeeModel.findById(req['user']['id']);
+
+      if (employee) {
+        return res.status(HttpStatus.OK).json({
+          email: employee.email,
+          phone: employee.phone,
+          fullName: employee.fullName,
+        });
+      } else {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: 'Сотрудник не найден' });
+      }
+    } catch (e) {
+      return res
+        .status(HttpStatus.NOT_FOUND)
+        .json({ message: 'Сотрудник не найден', details: e.message });
+    }
   }
 
   async createEmployee(dto: EmployeeDto, res: Response) {
@@ -70,7 +105,10 @@ export class EmployeeService {
         id: newEmployee._id,
       });
     } catch (e) {
-      return res.status(HttpStatus.BAD_REQUEST).json(e.message);
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'Произошла ошибка при создании сотрудника',
+        details: e.message,
+      });
     }
   }
 }

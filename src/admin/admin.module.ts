@@ -15,5 +15,6 @@ import { EntityParametersModule } from './modules/entity-parameters/entity-param
     ModelsModule,
     EntityParametersModule,
   ],
+  providers: [],
 })
 export class AdminModule {}
