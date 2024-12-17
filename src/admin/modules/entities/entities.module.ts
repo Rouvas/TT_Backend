@@ -13,6 +13,7 @@ import { EntitiesService } from './services/entities.service';
 import { EntityService } from './services/entity.service';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthGuard } from '../../guards/auth.guard';
+import { EntityStickerService } from "../../../common/services/entity-sticker.service";
 
 @Module({
   imports: [
@@ -30,6 +31,6 @@ import { AuthGuard } from '../../guards/auth.guard';
     ]),
   ],
   controllers: [EntitiesController],
-  providers: [EntitiesService, EntityService, AuthGuard],
+  providers: [EntitiesService, EntityService, AuthGuard, EntityStickerService],
 })
 export class EntitiesModule {}

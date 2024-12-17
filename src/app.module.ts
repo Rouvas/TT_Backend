@@ -7,7 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { UtilitiesController } from './common/controllers/utilities.controller';
+import { EntityStickerService } from './common/services/entity-sticker.service';
 
 @Module({
   imports: [
@@ -22,7 +22,6 @@ import { UtilitiesController } from './common/controllers/utilities.controller';
       token: '6841836949:AAFYzxczk5EveO0D9urMQz30dAe-8-c0aR8',
     }),
   ],
-  providers: [MailerService, TgbotService],
-  controllers: [UtilitiesController],
+  providers: [MailerService, TgbotService, EntityStickerService],
 })
 export class AppModule {}
