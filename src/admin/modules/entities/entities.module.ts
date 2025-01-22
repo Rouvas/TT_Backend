@@ -13,7 +13,7 @@ import { EntitiesService } from './services/entities.service';
 import { EntityService } from './services/entity.service';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthGuard } from '../../guards/auth.guard';
-import { EntityStickerService } from "../../../common/services/entity-sticker.service";
+import { EntityStickerService } from '../../../common/services/entity-sticker.service';
 
 @Module({
   imports: [
