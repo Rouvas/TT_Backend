@@ -9,17 +9,19 @@ import {
   Post,
   Res,
   UploadedFiles,
-  UseInterceptors
-} from "@nestjs/common";
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { EntityService } from './services/entity.service';
 import { EntitiesService } from './services/entities.service';
 import { Response } from 'express';
 import { EntityDto } from './dto/entity.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { diskStorage, memoryStorage } from "multer";
+import { diskStorage, memoryStorage } from 'multer';
 import { extname } from 'path';
 
 import { EntityImagePositionDto } from './dto/entity-image-position.dto';
+import { AuthGuard } from '../../guards/auth.guard';
 
 @Controller('admin/entities')
 export class EntitiesController {
@@ -29,21 +31,25 @@ export class EntitiesController {
   ) {}
 
   @Get()
+  @UseGuards(AuthGuard)
   getEntities(@Res() res: Response) {
     return this._entities.getEntities(res);
   }
 
   @Get(':id')
+  @UseGuards(AuthGuard)
   getEntity(@Param('id') id: string, @Res() res: Response) {
     return this._entity.getEntity(id, res);
   }
 
   @Post()
+  @UseGuards(AuthGuard)
   postEntity(@Body() newEntity: EntityDto, @Res() res: Response) {
     return this._entity.postEntity(newEntity, res);
   }
 
   @Post(':id/images')
+  @UseGuards(AuthGuard)
   @UseInterceptors(
     FilesInterceptor('image', 10, {
       storage: memoryStorage(), // Временное хранение в памяти
@@ -71,8 +77,8 @@ export class EntitiesController {
     return this._entity.checkEntityAndSaveFilesIntoStorage(id, files, res);
   }
 
-
   @Post(':id/images/position')
+  @UseGuards(AuthGuard)
   postChangeImagesPosition(
     @Param('id') id: string,
     @Body() dto: EntityImagePositionDto,
@@ -82,6 +88,7 @@ export class EntitiesController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard)
   patchEntity(
     @Param('id') id: string,
     @Body() newEntity: EntityDto,
@@ -89,7 +96,8 @@ export class EntitiesController {
   ) {}
 
   @Get(':id/sticker')
-  getEntitySticker(@Param('id') id: string, @Res() res: Response,) {
+  @UseGuards(AuthGuard)
+  getEntitySticker(@Param('id') id: string, @Res() res: Response) {
     return this._entity.getEntitySticker(id, res);
   }
 }

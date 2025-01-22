@@ -61,4 +61,5 @@ export class EntityParameter {
   valuesVariants: ValueVariant[] | ValueVariant | null;
 }
 
-export const EntityParameterSchema = SchemaFactory.createForClass(EntityParameter);
+export const EntityParameterSchema =
+  SchemaFactory.createForClass(EntityParameter);

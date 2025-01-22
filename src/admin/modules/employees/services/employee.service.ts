@@ -7,6 +7,7 @@ import {
   Employee,
   EmployeeDocument,
 } from '../../../../common/schemas/employee.schema';
+import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class EmployeeService {
@@ -44,10 +45,22 @@ export class EmployeeService {
         .status(HttpStatus.BAD_REQUEST)
         .json({ message: 'Незаполнены поля' });
     try {
-      const employee = await this._employeeModel.findByIdAndUpdate(id, dto);
-      return res
-        .status(HttpStatus.OK)
-        .json({ message: 'Успешно изменено', id: employee._id });
+      if (dto.password) {
+        const salt = await bcrypt.genSalt(10);
+        const password = await bcrypt.hash(dto.password, salt);
+        const employee = await this._employeeModel.findByIdAndUpdate(id, {
+          ...dto,
+          password: password,
+        });
+        return res
+          .status(HttpStatus.OK)
+          .json({ message: 'Успешно изменено', id: employee._id });
+      } else {
+        const employee = await this._employeeModel.findByIdAndUpdate(id, dto);
+        return res
+          .status(HttpStatus.OK)
+          .json({ message: 'Успешно изменено', id: employee._id });
+      }
     } catch (e) {
       return res
         .status(HttpStatus.NOT_FOUND)
@@ -101,9 +114,12 @@ export class EmployeeService {
 
   async createEmployee(dto: EmployeeDto, res: Response) {
     try {
+      const salt = await bcrypt.genSalt(10);
+      const password = await bcrypt.hash(dto.password, salt);
+
       const newEmployee = await this._employeeModel.create({
         ...dto,
-        password: dto.password ? dto.password : null,
+        password: dto.password ? password : null,
       });
 
       return res.status(HttpStatus.CREATED).json({

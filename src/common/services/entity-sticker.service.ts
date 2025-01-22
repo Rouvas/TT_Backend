@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as QRCode from 'qrcode';
 import * as PDFDocument from 'pdfkit';
 import { PassThrough } from 'stream';
-import * as path from "node:path";
+import * as path from 'node:path';
 
 export interface GenerateCardOptions {
   productId: string;
@@ -37,11 +37,24 @@ export class EntityStickerService {
         doc.pipe(stream);
 
         // Регистрация пользовательского шрифта
-        const fontPath = path.join(__dirname, '..', '..', '..', 'assets' ,'fonts', 'dejavu', 'DejaVuSans.ttf');
+        const fontPath = path.join(
+          __dirname,
+          '..',
+          '..',
+          '..',
+          'assets',
+          'fonts',
+          'dejavu',
+          'DejaVuSans.ttf',
+        );
         const boldFontPath = path.join(
           __dirname,
-          '..', '..', '..', 'assets',
-          'fonts', 'dejavu',
+          '..',
+          '..',
+          '..',
+          'assets',
+          'fonts',
+          'dejavu',
           'DejaVuSans-Bold.ttf',
         );
         doc.registerFont('DejaVuSans', fontPath);

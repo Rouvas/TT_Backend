@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document, Model, SchemaTypes, Types } from 'mongoose';
 import slugify from 'slugify';
-import { Brand, BrandSchema } from "./brand.schema";
-import { Model as BrandModel, ModelSchema } from "./model.schema";
+import { Brand, BrandSchema } from './brand.schema';
+import { Model as BrandModel, ModelSchema } from './model.schema';
 
 @Schema({
   _id: false,
